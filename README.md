@@ -116,6 +116,11 @@ var requestParams = {
         }
     }
 }
+
+seneca.act({ role: "push", cmd: "push", notifications: requestParams.notifications, config: requestParams.config }, function (err, result) {
+    console.log(err);
+    console.log(result);
+});
 ```
 
 # Licence
