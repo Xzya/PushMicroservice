@@ -1,0 +1,17 @@
+{
+  "name": "push-microservice",
+  "version": "0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mihail Cristian Dumitru",
+  "license": "ISC",
+  "dependencies": {
+    "seneca": "2.0.1",
+    "web-push": "2.1.1",
+    "apn": "1.7.5",
+    "node-gcm": "0.14.0"
+  }
+}
