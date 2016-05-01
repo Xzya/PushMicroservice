@@ -19,7 +19,7 @@ module.exports = function (options) {
         Validator.validateFirefox(args, function (err) {
             if (err) return callback(err);
 
-            webPush.sendNotification(args.endpoint, args.params)
+            webPush.sendNotification(args.token, args.params)
                 .then(function (result) {
                     callback(null, { result: result });
                 }).catch(function (err) {
@@ -38,7 +38,7 @@ module.exports = function (options) {
             if (err) return callback(err);
 
             webPush.setGCMAPIKey(args.config.gcm.apiKey);
-            webPush.sendNotification(args.endpoint, args.params)
+            webPush.sendNotification(args.token, args.params)
                 .then(function (result) {
                     callback(null, { result: result });
                 }).catch(function (err) {

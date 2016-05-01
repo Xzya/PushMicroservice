@@ -25,7 +25,7 @@ module.exports = function (options) {
 
             sender.sendNoRetry(message, { registrationTokens: args.tokens }, function (err, response) {
                 if (err) callback(err, null);
-                else callback(null, response);
+                else callback(null, { result: response });
             });
         });
     });
@@ -45,7 +45,7 @@ module.exports = function (options) {
 
             sender.sendNoRetry(message, { registrationTokens: args.tokens }, function (err, response) {
                 if (err) callback(err, null);
-                else callback(null, response);
+                else callback(null, { result: response });
             });
         });
     });

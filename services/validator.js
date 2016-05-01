@@ -35,8 +35,7 @@ module.exports = function () {
         if (!args.config) callback(new Error("Missing config parameter."));
         if (!args.config.gcm) callback(new Error("Missing gcm parameter."));
         if (!args.config.gcm.apiKey) callback(new Error("Missing GCM API Key."));
-        if (!args.tokens) callback(new Error("Missing tokens."));
-        if (args.tokens.length === 0) callback(new Error("Needs at least one token."));
+        if (!args.token) callback(new Error("Missing token."));
         callback();
     };
 
@@ -46,11 +45,7 @@ module.exports = function () {
      |--------------------------------------------------------------------------
     */
     this.validateFirefox = function (args, callback) {
-        if (!args.config) callback(new Error("Missing config parameter."));
-        if (!args.config.gcm) callback(new Error("Missing gcm parameter."));
-        if (!args.config.gcm.apiKey) callback(new Error("Missing GCM API Key."));
-        if (!args.tokens) callback(new Error("Missing tokens."));
-        if (args.tokens.length === 0) callback(new Error("Needs at least one token."));
+        if (!args.token) callback(new Error("Missing token."));
         callback();
     };
 

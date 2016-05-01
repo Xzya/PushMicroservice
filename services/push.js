@@ -49,7 +49,7 @@ module.exports = function (options) {
                     });
 
                     for (var j = 0; j < tokens.length; j++) {
-                        seneca.act({ role: "web-push", cmd: "chrome", endpoint: tokens[j], config: config, params: JSON.stringify(notification.web) }, function (err, result) {
+                        seneca.act({ role: "web-push", cmd: "chrome", token: tokens[j], config: config, params: notification.web }, function (err, result) {
 
                         });
                     }
@@ -80,7 +80,7 @@ module.exports = function (options) {
                     });
 
                     for (var j = 0; j < tokens.length; j++) {
-                        seneca.act({ role: "web-push", cmd: "firefox", endpoint: tokens[j], params: JSON.stringify(otification.web) }, function (err, result) {
+                        seneca.act({ role: "web-push", cmd: "firefox", token: tokens[j], params: notification.web }, function (err, result) {
 
                         });
                     }
@@ -109,13 +109,14 @@ module.exports = function (options) {
                     });
                 }
                 // Safari, we can send the payload directly
-                else if (platform.type === "ios") {
+                else if (platform.type === "safari") {
 
                     seneca.act({ role: "apn", cmd: "safari", config: config, tokens: tokens, params: notification.safari }, function (err, result) {
 
                     });
                 }
             }
+            callback();
         })
     });
 

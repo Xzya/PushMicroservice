@@ -44,6 +44,10 @@ module.exports = function (options) {
             }
 
             apnConnection.pushNotification(notif, devices);
+            apnConnection.on("error", function (err) {
+                console.log(err);
+            })
+            callback();
         })
     });
 
@@ -82,6 +86,10 @@ module.exports = function (options) {
             }
 
             apnConnection.pushNotification(notif, devices);
+            apnConnection.on("error", function (err) {
+                console.log(err);
+            })
+            callback();
         })
     });
 
