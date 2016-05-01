@@ -1,13 +1,27 @@
 {
   "name": "push-microservice",
-  "version": "0.1",
-  "description": "",
+  "version": "0.1.0",
+  "description": "A simple node.js microservice for sending push notifications.",
+  "keywords": [
+    "micro",
+    "service",
+    "microservice",
+    "push",
+    "notifications",
+    "gcm",
+    "apn",
+    "web push"
+  ],
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mihail Cristian Dumitru",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Xzya/PushMicroservice.git"
+  },
   "dependencies": {
     "seneca": "2.0.1",
     "web-push": "2.1.1",
