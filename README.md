@@ -15,6 +15,7 @@ This is a simple node.js microservice for sending push notifications.
 - [node-apn][node-apn] for Safari and iOS notifications
 - [node-gcm][node-gcm] for Android and Chrome multicast notifications
 - [web-push][web-push] for Chrome 50+ and Firefox 44+ notifications with payload
+- [kue][kue] for queueing tasks (disabled by default, you need to set USE_KUE to true in config/node_config.json, it uses Redis for storing the tasks)
 
 # Usage
 The request object is composed of two objects:
@@ -155,3 +156,4 @@ SOFTWARE.
 [apple-safari-doc]: <https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/NotificationProgrammingGuideForWebsites/PushNotifications/PushNotifications.html>
 [google-android-doc]: <https://developers.google.com/cloud-messaging/http-server-ref#downstream-http-messages-json>
 [mozilla-doc]: <https://developer.mozilla.org/ro/docs/Web/API/Push_API/Using_the_Push_API#Sending_chat_messages>
+[kue]: <https://github.com/Automattic/kue>
