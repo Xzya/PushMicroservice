@@ -15,16 +15,33 @@ module.exports = function (options) {
      | Plugins
      |--------------------------------------------------------------------------
     */
-    seneca.use("./services/web-push");
-    seneca.use("./services/gcm");
-    seneca.use("./services/apn");
+    seneca.use("./services/web-push", options);
+    seneca.use("./services/gcm", options);
+    seneca.use("./services/apn", options);
+
+    /*
+     |--------------------------------------------------------------------------
+     | Kue
+     |--------------------------------------------------------------------------
+    */
+    if (options.USE_KUE) {
+        var queue = require("kue").createQueue();
+
+        queue.process("push", options.MAX_CONCURRENT_JOBS, function (job, done) {
+            var args = job.data.args;
+
+            pushNotification(args, function (err, result) {
+                done(err, result);
+            });
+        });
+    }
 
     /*
      |--------------------------------------------------------------------------
      | Push
      |--------------------------------------------------------------------------
     */
-    seneca.add({ role: plugin, cmd: "push" }, function (args, callback) {
+    function pushNotification(args, callback) {
         Validator.validatePushRequest(args, function (err) {
             if (err) return callback(err);
 
@@ -117,7 +134,20 @@ module.exports = function (options) {
                 }
             }
             callback();
-        })
+        });
+    }
+
+    seneca.add({ role: plugin, cmd: "push" }, function (args, callback) {
+        if (options.USE_KUE) {
+            queue.create("push", {
+                title: "Push notification",
+                args: args
+            }).attempts(10).removeOnComplete(true).save();
+
+            callback(null, { result: "Processing..." })
+        } else {
+            pushNotification(args, callback);
+        }
     });
 
     return {

@@ -12,10 +12,35 @@ module.exports = function (options) {
 
     /*
      |--------------------------------------------------------------------------
+     | Kue
+     |--------------------------------------------------------------------------
+    */
+    if (options.USE_KUE) {
+        var queue = require("kue").createQueue();
+
+        queue.process("ios", options.MAX_CONCURRENT_JOBS, function (job, done) {
+            var args = job.data.args;
+
+            pushiOS(args, function (err, result) {
+                done(err, result);
+            });
+        });
+
+        queue.process("safari", options.MAX_CONCURRENT_JOBS, function (job, done) {
+            var args = job.data.args;
+
+            pushSafari(args, function (err, result) {
+                done(err, result);
+            });
+        });
+    }
+
+    /*
+     |--------------------------------------------------------------------------
      | iOS
      |--------------------------------------------------------------------------
     */
-    seneca.add({ role: plugin, cmd: "ios" }, function (args, callback) {
+    function pushiOS(args, callback) {
         Validator.validateiOS(args, function (err, data) {
             if (err) return callback(err, null);
 
@@ -48,7 +73,20 @@ module.exports = function (options) {
                 console.log(err);
             })
             callback();
-        })
+        });
+    }
+
+    seneca.add({ role: plugin, cmd: "ios" }, function (args, callback) {
+        if (options.USE_KUE) {
+            queue.create("ios", {
+                title: "iOS",
+                args: args
+            }).attempts(10).removeOnComplete(false).save();
+
+            callback(null, { result: "Processing..." })
+        } else {
+            pushiOS(args, callback);
+        }
     });
 
     /*
@@ -56,7 +94,7 @@ module.exports = function (options) {
      | Safari
      |--------------------------------------------------------------------------
     */
-    seneca.add({ role: plugin, cmd: "safari" }, function (args, callback) {
+    function pushSafari(args, callback) {
         Validator.validateiOS(args, function (err, data) {
             if (err) return callback(err, null);
 
@@ -90,7 +128,20 @@ module.exports = function (options) {
                 console.log(err);
             })
             callback();
-        })
+        });
+    }
+
+    seneca.add({ role: plugin, cmd: "safari" }, function (args, callback) {
+        if (options.USE_KUE) {
+            queue.create("safari", {
+                title: "Safari",
+                args: args
+            }).attempts(10).removeOnComplete(false).save();
+
+            callback(null, { result: "Processing..." })
+        } else {
+            pushSafari(args, callback);
+        }
     });
 
     return {

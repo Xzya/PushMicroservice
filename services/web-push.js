@@ -12,10 +12,35 @@ module.exports = function (options) {
 
     /*
      |--------------------------------------------------------------------------
+     | Kue
+     |--------------------------------------------------------------------------
+    */
+    if (options.USE_KUE) {
+        var queue = require("kue").createQueue();
+
+        queue.process("firefox", options.MAX_CONCURRENT_JOBS, function (job, done) {
+            var args = job.data.args;
+
+            pushFirefox(args, function (err, result) {
+                done(err, result);
+            });
+        });
+
+        queue.process("chrome", options.MAX_CONCURRENT_JOBS, function (job, done) {
+            var args = job.data.args;
+
+            pushChrome(args, function (err, result) {
+                done(err, result);
+            });
+        });
+    }
+
+    /*
+     |--------------------------------------------------------------------------
      | Firefox 44+
      |--------------------------------------------------------------------------
     */
-    seneca.add({ role: plugin, cmd: "firefox" }, function (args, callback) {
+    function pushFirefox(args, callback) {
         Validator.validateFirefox(args, function (err) {
             if (err) return callback(err);
 
@@ -26,6 +51,19 @@ module.exports = function (options) {
                     callback(err, null);
                 });
         });
+    }
+
+    seneca.add({ role: plugin, cmd: "firefox" }, function (args, callback) {
+        if (options.USE_KUE) {
+            queue.create("firefox", {
+                title: "Firefox",
+                args: args
+            }).attempts(10).removeOnComplete(false).save();
+
+            callback(null, { result: "Processing..." })
+        } else {
+            pushFirefox(args, callback);
+        }
     });
 
     /*
@@ -33,7 +71,7 @@ module.exports = function (options) {
      | Chrome 50+
      |--------------------------------------------------------------------------
     */
-    seneca.add({ role: plugin, cmd: "chrome" }, function (args, callback) {
+    function pushChrome(args, callback) {
         Validator.validateChrome(args, function (err) {
             if (err) return callback(err);
 
@@ -45,6 +83,19 @@ module.exports = function (options) {
                     callback(err, null);
                 });
         });
+    }
+
+    seneca.add({ role: plugin, cmd: "chrome" }, function (args, callback) {
+        if (options.USE_KUE) {
+            queue.create("chrome", {
+                title: "Chrome",
+                args: args
+            }).attempts(10).removeOnComplete(false).save();
+
+            callback(null, { result: "Processing..." })
+        } else {
+            pushChrome(args, callback);
+        }
     });
 
     return {

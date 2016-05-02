@@ -1,0 +1,4 @@
+{
+    "USE_KUE": false,
+    "MAX_CONCURRENT_JOBS": 10
+}

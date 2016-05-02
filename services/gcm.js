@@ -12,10 +12,35 @@ module.exports = function (options) {
 
     /*
      |--------------------------------------------------------------------------
+     | Kue
+     |--------------------------------------------------------------------------
+    */
+    if (options.USE_KUE) {
+        var queue = require("kue").createQueue();
+
+        queue.process("chrome:multicast", options.MAX_CONCURRENT_JOBS, function (job, done) {
+            var args = job.data.args;
+
+            pushChromeMulticast(args, function (err, result) {
+                done(err, result);
+            });
+        });
+
+        queue.process("android", options.MAX_CONCURRENT_JOBS, function (job, done) {
+            var args = job.data.args;
+
+            pushAndroid(args, function (err, result) {
+                done(err, result);
+            });
+        });
+    }
+
+    /*
+     |--------------------------------------------------------------------------
      | Chrome multicast
      |--------------------------------------------------------------------------
     */
-    seneca.add({ role: plugin, cmd: "chrome:multicast" }, function (args, callback) {
+    function pushChromeMulticast(args, callback) {
         Validator.validateChromeMulticast(args, function (err, data) {
             if (err) return callback(err, null);
 
@@ -28,6 +53,19 @@ module.exports = function (options) {
                 else callback(null, { result: response });
             });
         });
+    }
+
+    seneca.add({ role: plugin, cmd: "chrome:multicast" }, function (args, callback) {
+        if (options.USE_KUE) {
+            queue.create("chrome:multicast", {
+                title: "Chrome multicast",
+                args: args
+            }).attempts(10).removeOnComplete(false).save();
+
+            callback(null, { result: "Processing..." })
+        } else {
+            pushChromeMulticast(args, callback);
+        }
     });
 
     /*
@@ -35,7 +73,7 @@ module.exports = function (options) {
      | Android
      |--------------------------------------------------------------------------
     */
-    seneca.add({ role: plugin, cmd: "android" }, function (args, callback) {
+    function pushAndroid(args, callback) {
         Validator.validateAndroid(args, function (err, data) {
             if (err) return callback(err, null);
 
@@ -48,6 +86,19 @@ module.exports = function (options) {
                 else callback(null, { result: response });
             });
         });
+    }
+
+    seneca.add({ role: plugin, cmd: "android" }, function (args, callback) {
+        if (options.USE_KUE) {
+            queue.create("android", {
+                title: "Android",
+                args: args
+            }).attempts(10).removeOnComplete(false).save();
+
+            callback(null, { result: "Processing..." })
+        } else {
+            pushAndroid(args, callback);
+        }
     });
 
     return {
